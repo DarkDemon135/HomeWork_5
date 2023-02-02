@@ -1,50 +1,83 @@
-class flat
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Worker
 {
-private:
-    double price;
-    double area;
+    string surname;
+    string name;
+    string post;
+    int year;
+    int salary;
 public:
-    flat() : price(0), area(0) { };
-    flat(const double & prc, const double & area) : price(prc), area(area) { };
-    flat(const flat & date) : price(date.price), area(date.area) { };
-    ~flat() { };
-    flat & operator = (const flat & date);
- 
-    friend bool operator == (const flat & lhs, const flat & rhs);
-    friend bool operator != (const flat & lhs, const flat & rhs);
- 
-    friend bool operator > (const flat & lhs, const flat & rhs);
-    friend bool operator < (const flat & lhs, const flat & rhs);
+    Worker() {}
+    void Set();
+    void Show();
+    void PostList(string p);
+    void SalaryList(int s);
+    void ExperienceList(int y, int current);
 };
- 
-flat & flat::operator = (const flat & date)
+
+void Worker::Set()
 {
-    if (this == &date)
-    {
-        return *this;
-    }
- 
-    price = date.price;
-    area = date.area;
-    return *this;
+    cout << "Введите фамилию: "; cin >> surname;
+    cout << "Введите имя: "; cin >> name;
+    cout << "Введите должность: "; cin >> post;
+    cout << "Введите год поступления: "; cin >> year;
+    cout << "Введите зарплату: "; cin >> salary;
 }
- 
-bool operator == (const flat & lhs, const flat & rhs)
+
+void Worker::Show()
+
 {
-    return lhs.area == rhs.area;
+    cout << "Имя :" << surname << " " << name << endl;
+    cout << "Должность:" << post << endl;
+    cout << "Год :" << year << endl;
+    cout << "Зарплата:" << salary << endl;
 }
- 
-bool operator != (const flat & lhs, const flat & rhs)
+
+void Worker::PostList(string p)
+
 {
-    return !(lhs.area == rhs.area);
+    if (post == p) cout << surname << " " << name << endl;
 }
- 
-bool operator > (const flat & lhs, const flat & rhs)
+
+void Worker::SalaryList(int s)
 {
-    return lhs.price > rhs.price;
+    if (salary>s) cout << surname << " " << name << endl;
 }
- 
-bool operator < (const flat & lhs, const flat & rhs)
+
+void Worker::ExperienceList(int y, int current)
 {
-    return lhs.price < rhs.price;
+    int Year = year - current;
+    if (Year>y) cout << surname << " " << name << endl;
+}
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    int n;
+    cout << "Введите кол-во сотрудников: "; cin >> n;
+    Worker* worker = new Worker[n];
+    for (int i = 0; i<n; i++)
+        worker[i].Set();
+    cout << "Список сотрудников: " << endl;
+    for (int i = 0; i<n; i++)
+        worker[i].Show();
+    string post;
+    cout << "Введите должность: "; cin >> post;
+    for (int i = 0; i<n; i++)
+        worker[i].PostList(post);
+    int salary;
+    cout << "Введите зарплату: "; cin >> salary;
+    for (int i = 0; i<n; i++)
+        worker[i].SalaryList(salary);
+    int current, year;
+    cout << "Введите текущий год: "; cin >> current;
+    cout << "Введите кол-во рабочих лет: "; cin >> year;
+    for (int i = 0; i<n; i++)
+        worker[i].ExperienceList(year, current);
+    delete[] worker;
+    return 0;
 }
