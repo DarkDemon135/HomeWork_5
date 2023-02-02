@@ -1,144 +1,118 @@
 #include <iostream>
 #include <string.h>
-class Overcoat
+#include <map>
+using namespace std;
+char* strdup(const char* source)
 {
-    char* type;
-    char* size;
-    char* color;
-    double price;
+    unsigned int len = strlen(source) + 1;
+    char *buf = (char*)malloc(len);
+    memmove(buf, source, len);
+    return buf;
+}
+class Overcoat {
+	char* type_;
+	char* brand_;
+	char* model_;
+	double price_;
 public:
-    Overcoat(const char* typeP, const char* sizeP, const char* colorP, double priceP);
-    Overcoat() : type{ nullptr }, size{ nullptr }, color{ nullptr }, price{ 0 }{}
-    Overcoat(const Overcoat& object);
-    Overcoat(Overcoat&& object);
- 
-    Overcoat& setType(const char* typeP);
-    Overcoat& setSize(const char* sizeP);
-    Overcoat& setColor(const char* colorP);
-    Overcoat& setPrise(double priceP) { price = priceP; return *this; };
- 
-    const char* getType()const { return type; }
-    const char* getSize()const { return size; }
-    const char* getColor()const { return color; }
-    double getPrice()const { return price; }
- 
-    Overcoat& operator=(const Overcoat& object);
-    Overcoat& operator=(Overcoat&& object);
- 
-    friend bool operator==(const Overcoat& left, const Overcoat& right);
-    friend bool operator>(const Overcoat& left, const Overcoat& right);
-    
-    friend std::ostream& operator<<(std::ostream& out, const Overcoat& object);
- 
-    ~Overcoat() { delete[] type; delete[] size; delete[] color; }
+	Overcoat() :Overcoat("", "", "", 0) {}
+	Overcoat(const char*, const char*, const char*, double); 
+	~Overcoat();
+	Overcoat(const Overcoat& other);
+	Overcoat(Overcoat&& other);
+	Overcoat& operator=(const Overcoat& other);
+	Overcoat& operator=(Overcoat&& other);
+	bool operator==(const Overcoat& other);
+	bool operator!=(const Overcoat& other);
+	bool operator>(const Overcoat& other);
+	bool operator<(const Overcoat& other);
+	friend ostream& operator<<(ostream& out, const Overcoat& other);
+	friend void swap(Overcoat& l, Overcoat& r);	
 };
+Overcoat::Overcoat(const char* type, const char* brand, const char* model, double price) {
+	type_ = strdup(type);
+	brand_ = strdup(brand);
+	model_ = strdup(model);
+	price_ = price;
+}
+Overcoat::~Overcoat() {
+	delete[]type_;
+	delete[]brand_;
+	delete[]model_;
+}
+Overcoat::Overcoat(const Overcoat& other) {
+	type_ = strdup(other.type_);
+	brand_ = strdup(other.brand_);
+	model_ = strdup(other.model_);
+	price_ = other.price_;
+}
+Overcoat::Overcoat(Overcoat&& other) {
+	type_ = other.type_;
+	other.type_ = nullptr;
+	brand_ = other.brand_;
+	other.brand_ = nullptr;
+	model_ = other.model_;
+	other.model_ = nullptr;
+	price_ = other.price_;
+}
+Overcoat& Overcoat::operator=(const Overcoat& other) {
+	Overcoat tmp(other);
+	swap(*this, tmp);
+	return *this;
+}
+Overcoat& Overcoat::operator=(Overcoat&& other) {
+	swap(*this, other);
+	return *this;
+}
+bool Overcoat::operator==(const Overcoat& other) {
+	map <char*, char*> MAP({ {type_, other.type_}, {brand_, other.brand_}, {model_, other.model_} });
+	for (auto& i : MAP) {
+		if (strlen(i.first) != strlen(i.second))
+			return false;
+		if (strcmp(i.first, i.second))
+			return false;
+	}
+	if (price_ != other.price_)
+		return false;
+	return true;
+}
+bool Overcoat::operator!=(const Overcoat& other) {
+	return !(operator == (other));
+}
+bool Overcoat::operator>(const Overcoat& other) {
+	return price_ > other.price_;
+}
+bool Overcoat::operator<(const Overcoat& other) {
+	return price_ < other.price_;
+}
+ostream& operator<<(ostream& out, const Overcoat& other) {
+	out << " : " << other.type_ << ", Марка: " << other.brand_ <<
+		", Модель: " << other.model_ << ", Цена: " << other.price_;
+	return out;
+}
+void swap(Overcoat& l, Overcoat& r) {
+	using std::swap;
+	swap(l.type_, r.type_);
+	swap(l.brand_, r.brand_);
+	swap(l.model_, r.model_);
+	swap(l.price_, r.price_);
+}
 
-Overcoat::Overcoat(Overcoat&& object) :
-    type{ object.type }, size{ object.size }, color{ object.color }, price{ object.price }
-{
-    object.type = nullptr;
-    object.size = nullptr;
-    object.color = nullptr;
-    object.price = 0;
-}
- 
-Overcoat& Overcoat::setType(const char* typeP)
-{
-    delete[] type;
-    type = new char[strlen(typeP) + 1];
-    return *this;
-}
-Overcoat& Overcoat::setSize(const char* sizeP)
-{
-    delete[] size;
-    size = new char[strlen(sizeP) + 1];
-    strcpy_s(size, strlen(sizeP) + 1, sizeP);
-    return *this;
-}
-Overcoat& Overcoat::setColor(const char* colorP)
-{
-    delete[] color;
-    color = new char[strlen(colorP) + 1];
-    strcpy_s(color, strlen(colorP) + 1, colorP);
-    return *this;
-}
- 
-Overcoat& Overcoat::operator=(const Overcoat& object)
-{
-    if (this == &object) { return *this; }
+int main() {
+
+	Overcoat p01("Пальто", "Zara", "D-271", 2475);
+	Overcoat p02("Пальто", "Mango", "21980648-07", 999);
+	Overcoat p03;
+	p03 = p01;
+
+	cout << "p01:\t" << p01 << endl;
+	cout << "p02:\t" << p02 << endl;
+	cout << "p03:\t" << p03 << endl;
+	cout << endl;
+	cout << "p01" << " == " << "p02" << ": " << boolalpha << (p01 == p02) << endl;
+	cout << "p01" << " == " << "p03" << ": " << boolalpha << (p01 == p03) << endl;
+	cout << "p01" << " <  " << "p02" << ": " << boolalpha << (p01 < p02) << endl;
+	cout << "p01" << " >  " << "p02" << ": " << boolalpha << (p01 > p02) << endl;
     
-    delete[] type;
-    delete[] size;
-    delete[] color;
- 
-    type = new char[strlen(object.type) + 1];
-    size = new char[strlen(object.size) + 1];
-    color = new char[strlen(object.color) + 1];
-    strcpy_s(type, strlen(object.type) + 1, object.type);
-    strcpy_s(size, strlen(object.size) + 1, object.size);
-    strcpy_s(color, strlen(object.color) + 1, object.color);
-    price = object.price;
-    return *this;
-}
-Overcoat& Overcoat::operator=(Overcoat&& object)
-{
-    if (this == &object) { return *this; }
- 
-    delete[] type;
-    delete[] size;
-    delete[] color;
- 
-    type = object.type;
-    size = object.size;
-    color = object.color;
-    price = object.price;
- 
-    object.type = nullptr;
-    object.size = nullptr;
-    object.color = nullptr;
-    object.price = 0;
- 
-    return *this;
-}
- 
-bool operator==(const Overcoat& left, const Overcoat& right)
-{
-    return (strcmp(left.type, right.type) == 0 and strcmp(left.size, right.size) == 0 and strcmp(left.color, right.color) == 0 and left.price == right.price );
-}
- 
-bool operator>(const Overcoat& left, const Overcoat& right) 
-{ 
-    return (left.price > right.price); 
-}
- 
-std::ostream& operator<<(std::ostream& out, const Overcoat& object)
-{
-    if (object.type and object.size and object.color and object.price) 
-    { 
-        out << "Type: " << object.type << " Size: " << object.size << " Color: " << object.color << " Price: " << object.price << '\n';
-    }
-    else { out << "[empty overcoat]"; }
-    return out;
-}
- 
-int main()
-{
-    Overcoat overcoat_1;
-    std::cout << overcoat_1 << '\n';
- 
-    Overcoat coatBlack{ "coat", "M", "black", 3500.5 };
-    Overcoat coatBrown{ "coat", "L", "brown", 4850.8 };
-    std::cout << coatBlack << coatBrown << '\n';
- 
-    overcoat_1 = coatBlack;
-    Overcoat coat_2{ std::move(coatBrown) };
-    std::cout << coatBlack << overcoat_1 << coat_2 << coatBrown << '\n';
- 
-    Overcoat leatherJacket{ "jacket", "M", "black", 5700 };
-    std::cout << std::boolalpha << "\nJacket is more expensive than a coat #2 - " << (leatherJacket > coat_2) << '\n';
-    
-    std::cout << std::boolalpha << "\nCoats black and #1 are the same - " << (coatBlack == overcoat_1) << '\n';
-    std::cout << std::boolalpha << "\nCoats black and #2 are the same - " << (coatBlack == coat_2) << '\n';
- 
     return 0;
 }
