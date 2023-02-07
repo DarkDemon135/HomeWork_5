@@ -39,7 +39,7 @@ int64_t binarySearch(T arr[], int64_t nSize, T value)
 int main()
 {
     int arr[] = { 4, 2, 1, 3, 0, 5 };
- 
+    int key;
     int min = INT_MAX, max = INT_MIN;
     for (int i: arr)
     {
@@ -69,6 +69,24 @@ int main()
         cout << arr[i] << " ";
     }
     cout << endl;
+
+    cin >> key; // считываем ключ
+
+  bool flag = false;
+  int l = 0; // левая граница
+  int r = 9; 
+  int mid;
+
+    while ((l <= r) && (flag != true)) {
+        mid = (l + r) / 2; // считываем срединный индекс отрезка [l,r]
+
+        if (arr[mid] == key) flag = true; //проверяем ключ со серединным элементом
+            if (arr[mid] > key) r = mid - 1; // проверяем, какую часть нужно отбросить
+            else l = mid + 1;
+    }
+
+    if (flag) cout << "Индекс элемента " << key << " в массиве равен: " << mid;
+    else cout << "Извините, но такого элемента в массиве нет";
  
     return 0;
 }
